@@ -23,6 +23,7 @@ export default function AddTask() {
     database.tasks.add({
       task: task,
       userId: currentUser.uid,
+      history: [{data: "Task created", createdAt: new Date()}],
       assignedTo: null,
       assignedBy: null,
       createdAt: database.getCurrentTimestamp()

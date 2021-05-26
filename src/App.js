@@ -8,6 +8,7 @@ import SignUp from "./pages/SignUp";
 import PrivateRoute from "./PrivateRoute";
 import GuestRoute from "./GuestRoute";
 import Signin from "./pages/Signin";
+import TaskPage from "./pages/TaskPage";
 function App() {
   const { currentUser } = useAuth();
   if (!currentUser) {
@@ -22,9 +23,10 @@ function App() {
 
   return (
     <Switch>
-      <GuestRoute path="/accounts/login" component={Signin} />
-      <Route path="/accounts/emailsignup" component={SignUp} />
-      <PrivateRoute path="/" component={Dashboard} />
+      <GuestRoute exact path="/accounts/login" component={Signin} />
+      <GuestRoute exact path="/accounts/emailsignup" component={SignUp} />
+      <PrivateRoute exact path="/" component={Dashboard} />
+      <PrivateRoute exact path="/t/:taskId" component={TaskPage} />
     </Switch>
   );
 }
