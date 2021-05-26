@@ -16,6 +16,7 @@ export const firestore = app.firestore();
 export const database = {
   tasks: firestore.collection("tasks"),
   comments: firestore.collection("comments"),
+  users: firestore.collection("users"),
   getCurrentTimestamp: firebase.firestore.FieldValue.serverTimestamp,
 }
 export default app;

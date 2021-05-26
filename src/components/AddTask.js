@@ -25,6 +25,7 @@ export default function AddTask() {
       userId: currentUser.uid,
       assignedTo: null,
       assignedBy: null,
+      createdAt: database.getCurrentTimestamp()
     });
     setTask("");
     closeModal();
