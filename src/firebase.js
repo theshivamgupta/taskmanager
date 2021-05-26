@@ -1,5 +1,6 @@
 import firebase from "firebase/app";
 import "firebase/auth";
+import 'firebase/firestore'
 
 const app = firebase.initializeApp({
   apiKey: "AIzaSyD2961DuecsMUBh8wZnkSwABbsGMKuETKk",
@@ -11,4 +12,10 @@ const app = firebase.initializeApp({
 });
 
 export const auth = app.auth();
+export const firestore = app.firestore();
+export const database = {
+  tasks: firestore.collection("tasks"),
+  comments: firestore.collection("comments"),
+  getCurrentTimestamp: firebase.firestore.FieldValue.serverTimestamp,
+}
 export default app;
