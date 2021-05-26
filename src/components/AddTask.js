@@ -26,6 +26,7 @@ export default function AddTask() {
       history: [{data: "Task created", createdAt: new Date()}],
       assignedTo: null,
       assignedBy: null,
+      status: 'TO DO',
       createdAt: database.getCurrentTimestamp()
     });
     setTask("");
