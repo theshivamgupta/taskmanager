@@ -105,10 +105,23 @@ export default function TaskPage() {
         <Card>
           <Card.Header as="h5">Task</Card.Header>
           <Card.Body>
-            <Card.Title>Special title treatment</Card.Title>
+            <Card.Title></Card.Title>
             <Card.Text>
-              With supporting text below as a natural lead-in to additional
-              content.
+              {taskDetails?.type === "image" && (
+                <img
+                  src={taskDetails?.task}
+                  alt="task"
+                  style={{ width: "50%", height: "50%" }}
+                />
+              )}
+              {taskDetails?.type === "video" && (
+                <video width="320" height="240" controls>
+                  <source src={taskDetails?.task} type="video/mp4" />
+                  <source src={taskDetails?.task} type="video/ogg" />
+                  Your browser does not support the video tag.
+                </video>
+              )}
+              {taskDetails?.type === "text" && `${taskDetails?.task}`}
             </Card.Text>
             <div className="d-flex">
               <Dropdown>
