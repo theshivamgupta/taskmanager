@@ -4,11 +4,13 @@ import { useParams } from "react-router";
 import NavbarComponent from "../components/Navbar";
 import { useAuth } from "../Context/AuthContext";
 import { database } from "../firebase";
+import ListComment from "../components/ListComment";
 
 const statuses = ["TO DO", "DOING", "DONE"];
 
 export default function TaskPage() {
   const [userList, setUserList] = useState([]);
+  const [commentList, setCommentList] = useState([]);
   const [taskDetails, setTaskDetails] = useState();
   const [progress, setProgress] = useState("");
   const [assignUsername, setAssignUsername] = useState("");
@@ -30,6 +32,20 @@ export default function TaskPage() {
       .doc(taskId)
       .get()
       .then((snapshot) => setTaskDetails(snapshot.data()));
+
+    database.comments
+      .where("taskId", "==", taskId)
+      .get()
+      .then((doc) => {
+        // console.log("doc", doc.docs[0].data());
+        // email = doc.docs[0].data();
+        let documents = [];
+        doc.docs.forEach((comm) => {
+          documents.push({ ...comm.data(), id: comm.id });
+        });
+        console.log(documents);
+        setCommentList(documents);
+      });
   }, [taskId]);
 
   function handleAssign(event) {
@@ -67,11 +83,14 @@ export default function TaskPage() {
 
   function handleAddComment(e) {
     e.preventDefault();
-    database.comments.add({
-      content: commentText,
-      taskId: taskId,
-      userId: currentUser.uid,
-    });
+    setTimeout(() => {
+      database.comments.add({
+        content: commentText,
+        taskId: taskId,
+        email: currentUser.email,
+        createdAt: database.getCurrentTimestamp(),
+      });
+    }, 0);
   }
 
   return (
@@ -150,6 +169,11 @@ export default function TaskPage() {
           <Button variant="success" onClick={handleAddComment}>
             Post Comment
           </Button>
+          {commentList?.map((comment) => (
+            <div key={comment?.id}>
+              <ListComment comment={comment} />
+            </div>
+          ))}
         </div>
       </div>
       <MyVerticallyCenteredModal

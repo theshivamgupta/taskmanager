@@ -43,14 +43,6 @@ const Dashboard = () => {
     <>
       <NavbarComponent />
       <Container fluid>
-        <button
-          onClick={(e) => {
-            e.preventDefault();
-            console.log(assignedTask);
-          }}
-        >
-          Click
-        </button>
         <div className="d-flex align-items-center">
           <AddTask />
         </div>
