@@ -30,7 +30,7 @@ export default function Signup() {
       await createUserDocument(user, { username });
       history.push("/");
     } catch (err) {
-      console.log(err);
+      // console.log(err);
       setError("Failed to create an account");
     }
 

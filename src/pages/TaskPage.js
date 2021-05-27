@@ -43,7 +43,7 @@ export default function TaskPage() {
         doc.docs.forEach((comm) => {
           documents.push({ ...comm.data(), id: comm.id });
         });
-        console.log(documents);
+        // console.log(documents);
         setCommentList(documents);
       });
   }, [taskId]);
