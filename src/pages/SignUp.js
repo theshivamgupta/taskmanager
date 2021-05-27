@@ -20,7 +20,6 @@ export default function Signup() {
     if (passwordRef.current.value !== passwordConfirmRef.current.value) {
       return setError("Passwords do not match");
     }
-
     try {
       setError("");
       setLoading(true);

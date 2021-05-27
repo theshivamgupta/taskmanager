@@ -8,6 +8,7 @@ import { database } from "../firebase";
 
 const Dashboard = () => {
   const [mytask, SetMyTask] = useState([]);
+  const [assignedTask, setAssignedTask] = useState([]);
   const { currentUser } = useAuth();
 
   useEffect(() => {
@@ -21,7 +22,20 @@ const Dashboard = () => {
           document.push({ ...doc.data(), id: doc.id });
         });
         SetMyTask(document);
-        console.log(document);
+        // console.log("document", document);
+      });
+    database.tasks
+      // .where("userId", "==", currentUser.uid)
+      .where("assignedTo.email.email", "==", currentUser.email)
+      .orderBy("createdAt", "desc")
+      .onSnapshot((snap) => {
+        let document = [];
+        snap.forEach((doc) => {
+          document.push({ ...doc.data(), id: doc.id });
+          // console.log(doc.data());
+        });
+        setAssignedTask(document);
+        // console.log("document", document);
       });
   }, [currentUser]);
 
@@ -29,21 +43,33 @@ const Dashboard = () => {
     <>
       <NavbarComponent />
       <Container fluid>
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            console.log(assignedTask);
+          }}
+        >
+          Click
+        </button>
         <div className="d-flex align-items-center">
           <AddTask />
         </div>
         <div className="p-4">
-        <h1>My Task</h1>
-        <hr/>
+          <h1>My Task</h1>
+          <hr />
           {mytask.map((task) => (
             <div key={task?.id}>
-                <ListMyTask task={task}/>
-
-              </div>
+              <ListMyTask task={task} />
+            </div>
           ))}
-          <div className='p-4'></div>
+          <div className="p-4"></div>
           <h1>Assigned Task</h1>
-          <hr/>
+          <hr />
+          {assignedTask?.map((task) => (
+            <div key={task?.id}>
+              <ListMyTask task={task} />
+            </div>
+          ))}
         </div>
       </Container>
     </>

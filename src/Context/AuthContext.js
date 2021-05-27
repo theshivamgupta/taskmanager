@@ -13,7 +13,6 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   function signup(email, password) {
-    
     return auth.createUserWithEmailAndPassword(email, password);
   }
 
@@ -39,15 +38,15 @@ export function AuthProvider({ children }) {
 
   const createUserDocument = async (user, additionalData) => {
     if (!user) return;
-  
+
     const userRef = firestore.doc(`users/${user.uid}`);
-  
+
     const snapshot = await userRef.get();
-  
+
     if (!snapshot.exists) {
       const { email } = user;
       const { username } = additionalData;
-  
+
       try {
         await userRef.set({
           username,
@@ -55,7 +54,7 @@ export function AuthProvider({ children }) {
           createdAt: new Date(),
         });
       } catch (error) {
-        console.log('Error in creating user', error);
+        console.log("Error in creating user", error);
       }
     }
   };
@@ -77,7 +76,7 @@ export function AuthProvider({ children }) {
     resetPassword,
     updateEmail,
     updatePassword,
-    createUserDocument
+    createUserDocument,
   };
 
   return (

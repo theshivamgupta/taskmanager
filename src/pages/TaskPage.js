@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Card, Dropdown } from "react-bootstrap";
+import { Button, Card, Dropdown, Form, Modal } from "react-bootstrap";
 import { useParams } from "react-router";
 import NavbarComponent from "../components/Navbar";
 import { useAuth } from "../Context/AuthContext";
@@ -12,9 +12,11 @@ export default function TaskPage() {
   const [taskDetails, setTaskDetails] = useState();
   const [progress, setProgress] = useState("");
   const [assignUsername, setAssignUsername] = useState("");
+  const [modalShow, setModalShow] = React.useState(false);
+  const [commentText, setCommentText] = useState("");
   const { taskId } = useParams();
   const { currentUser } = useAuth();
-
+  // console.log(currentUser);
   useEffect(() => {
     database.users.orderBy("createdAt", "desc").onSnapshot((snap) => {
       let document = [];
@@ -22,7 +24,7 @@ export default function TaskPage() {
         document.push({ ...doc.data(), id: doc.id });
       });
       setUserList(document);
-      console.log(document);
+      // console.log(document);
     });
     database.tasks
       .doc(taskId)
@@ -32,24 +34,55 @@ export default function TaskPage() {
 
   function handleAssign(event) {
     event.preventDefault();
-    database.tasks.doc(taskId).update({
-      assignedTo: assignUsername,
-      history: [{createdAt: new Date(), data: `Assigned to ${assignUsername}`}, ...taskDetails.history]
-    });
+    database.users
+      .where("username", "==", assignUsername)
+      .get()
+      .then((doc) => {
+        // console.log("doc", doc.docs[0].data());
+        // email = doc.docs[0].data();
+        database.tasks.doc(taskId).update({
+          assignedTo: {
+            // username: assignUsername,
+            email: doc.docs[0].data(),
+          },
+          history: [
+            { createdAt: new Date(), data: `Assigned to ${assignUsername}` },
+            ...taskDetails.history,
+          ],
+        });
+      });
   }
 
   function handleStatus(event) {
     event.preventDefault();
     database.tasks.doc(taskId).update({
-        status: progress,
-        history: [{createdAt: new Date(), data: `Status changed to ${progress}`}, ...taskDetails.history]
-      });
+      status: progress,
+      history: [
+        { createdAt: new Date(), data: `Status changed to ${progress}` },
+        ...taskDetails.history,
+      ],
+    });
+    // window.location.reload();
+  }
+
+  function handleAddComment(e) {
+    e.preventDefault();
+    database.comments.add({
+      content: commentText,
+      taskId: taskId,
+      userId: currentUser.uid,
+    });
   }
 
   return (
     <div>
       <NavbarComponent />
       <div className="p-5">
+        <div className="p-3">
+          <Button variant="success" onClick={() => setModalShow(true)}>
+            History
+          </Button>
+        </div>
         <Card>
           <Card.Header as="h5">Task</Card.Header>
           <Card.Body>
@@ -100,7 +133,59 @@ export default function TaskPage() {
             </div>
           </Card.Body>
         </Card>
+        <div className="p-3">
+          <h1>Comments</h1>
+          <hr />
+          <Form.Group className="mb-3">
+            <Form.Label>Write your comment here...</Form.Label>
+            <Form.Control
+              as="textarea"
+              rows={3}
+              onChange={(e) => {
+                e.preventDefault();
+                setCommentText(e.target.value);
+              }}
+            />
+          </Form.Group>
+          <Button variant="success" onClick={handleAddComment}>
+            Post Comment
+          </Button>
+        </div>
       </div>
+      <MyVerticallyCenteredModal
+        show={modalShow}
+        onHide={() => setModalShow(false)}
+        historylist={taskDetails?.history}
+      />
     </div>
+  );
+}
+
+function MyVerticallyCenteredModal(props) {
+  const { historylist } = props;
+  // console.log("history", historylist);
+  return (
+    <Modal
+      {...props}
+      size="lg"
+      aria-labelledby="contained-modal-title-vcenter"
+      centered
+    >
+      <Modal.Header>
+        <Modal.Title id="contained-modal-title-vcenter">History</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        {historylist?.map((history, index) => (
+          <Card key={index}>
+            <Card.Body>{history?.data}</Card.Body>
+          </Card>
+        ))}
+      </Modal.Body>
+      <Modal.Footer>
+        <Button variant="light" onClick={props.onHide}>
+          Close
+        </Button>
+      </Modal.Footer>
+    </Modal>
   );
 }
